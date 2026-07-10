@@ -208,9 +208,9 @@ describe("parseUnifiedEnvelope", () => {
     expect(warnings.some((w) => w.code === "row-skipped")).toBe(true);
   });
 
-  test("normalizes the full real local fixture", async () => {
+  test("normalizes the full real laptop fixture", async () => {
     const text = await Bun.file(
-      new URL("../fixtures/real/local/unified.json", import.meta.url),
+      new URL("../fixtures/real/laptop/unified.json", import.meta.url),
     ).text();
     const { value, warnings } = unwrap(parseUnifiedEnvelope(text, ["omp"]));
     expect(value.daily).toHaveLength(85);

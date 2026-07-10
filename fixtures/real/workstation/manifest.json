@@ -1,5 +1,5 @@
 {
-  "host": "local",
+  "host": "workstation",
   "fetchedAt": "2026-07-10",
   "tz": "America/Boise",
   "since": "2026-04-11",
@@ -25,7 +25,7 @@
         "<tempfile>"
       ],
       "exitCode": 0,
-      "bytes": 2779477
+      "bytes": 1065991
     }
   ]
 }

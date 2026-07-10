@@ -144,9 +144,9 @@ legend, freshness dots, settings list.
 
 | host  | color     | swatch context |
 |-------|-----------|----------------|
-| local | `#7c8cf8` | periwinkle |
-| mm    | `#4ec9b0` | teal |
-| clawd | `#e8a951` | amber |
+| laptop      | `#7c8cf8` | periwinkle |
+| workstation | `#4ec9b0` | teal |
+| buildbox    | `#e8a951` | amber |
 
 User-added hosts supply their own hex (config-validated). Never recolor, never theme-adjust: the
 same hex is used in dark and light (all three sit at L* ~65–75 and pass as fills on both themes;
@@ -347,7 +347,7 @@ older data" when `/api/status` reports a refresh triggered.
 
 **Chip anatomy** (host and harness chips share it): pill, height 28px, `padding: 0 12px 0 10px`,
 12/16 500, containing an 8px identity dot (host color / harness color) + label + (host chips only)
-that host's cost for the active range in `--text-muted` tabular (e.g. `mm · $1,917`).
+that host's cost for the active range in `--text-muted` tabular (e.g. `workstation · $1,917`).
 
 - **Active (included):** `background: color-mix(in srgb, <identity> 16%, transparent)`; `border:
   1px solid color-mix(in srgb, <identity> 45%, transparent)`; text `--text-primary`; dot full
@@ -501,7 +501,7 @@ title row "Hosts" + close ×. Esc and scrim-click dismiss (FR7).
   azure #5a9df6 measures 2.77:1 vs 6.76:1 for the dark label; bright-accent-with-dark-label is
   the Linear/Vercel idiom. `.btn-danger` follows the same rule on `--negative`). Save PUTs
   config; success toast; no restart needed.
-- **Remove** asks inline confirmation (row turns `--negative-muted`, "Remove mm? Its cached data
+- **Remove** asks inline confirmation (row turns `--negative-muted`, "Remove workstation? Its cached data
   will stop being shown." + Confirm/Cancel) — never a browser `confirm()`.
 
 ### 6.7 Test connection, tooltips & toasts
@@ -524,7 +524,7 @@ names, freshness detail, approximate note.
 **Toasts**: bottom-right (bottom-center ≤640px), stack max 3, width 360px, §5 floating, radius 8,
 `padding: 12px 14px`, left accent border 2px (`--positive`/`--negative`/`--warning`/`--accent` for
 info). Content: 13/20 600 title + optional 12/16 `--text-secondary` detail **including the actual
-failure reason** (e.g. "Refresh failed for mm — ssh exit 255: connection refused"). Auto-dismiss
+failure reason** (e.g. "Refresh failed for workstation — ssh exit 255: connection refused"). Auto-dismiss
 6s (errors 10s), hover pauses, × always present. Enter: 200ms ease-out slide-up + fade; exit fade
 150ms.
 
@@ -550,8 +550,8 @@ first host", copy explaining local vs SSH in two sentences, a primary "Add host"
 
 **Per-host freshness** (from `/api/status`): one compact cluster per host — host identity dot
 (8px) + 6px **status dot** overlapping its corner: `fresh` = `--positive`, `stale` = `--warning`,
-`error` = `--negative`, `never` = `--text-disabled`. Hover tooltip: "mm · fresh · refreshed 3m ago"
-or "clawd · error: ssh exit 255 (showing cached data from 2h ago)". At ≤767px the cluster
+`error` = `--negative`, `never` = `--text-disabled`. Hover tooltip: "workstation · fresh · refreshed 3m ago"
+or "buildbox · error: ssh exit 255 (showing cached data from 2h ago)". At ≤767px the cluster
 collapses to a single worst-status dot + count ("3 hosts").
 
 **Refresh button**: ghost icon button (28px, radius 6) with a refresh glyph + relative age text

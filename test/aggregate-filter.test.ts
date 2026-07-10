@@ -61,10 +61,10 @@ const REAL_WINDOW: DateRange = { from: "2026-04-11", to: "2026-07-10" };
  *   jq '[.daily[] | select(.period >= "2026-06-25" and .period <= "2026-07-01")]
  *       | {cost: (map(.totalCost)|add), input: (map(.inputTokens)|add), ...}'
  */
-const LOCAL_W_COST = 841.4703578499982; // 7 rows (every day present)
-const MM_W_COST = 256.19756140000004; // 4 rows: 06-28..07-01
-const CLAWD_W_COST = 55.327930669999986; // 3 rows: 06-29..07-01
-const COMBINED_W_COST = LOCAL_W_COST + MM_W_COST + CLAWD_W_COST;
+const LAPTOP_W_COST = 841.4703578499982; // 7 rows (every day present)
+const WORKSTATION_W_COST = 256.19756140000004; // 4 rows: 06-28..07-01
+const BUILDBOX_W_COST = 55.327930669999986; // 3 rows: 06-29..07-01
+const COMBINED_W_COST = LAPTOP_W_COST + WORKSTATION_W_COST + BUILDBOX_W_COST;
 
 // Combined token sums for the same window (plain addition of the jq per-host sums):
 const COMBINED_W_INPUT = 11905724 + 9241865 + 3973160; // 25120749
@@ -74,14 +74,14 @@ const COMBINED_W_CACHE_READ = 447747201 + 81976372 + 32945811; // 562669384
 const COMBINED_W_TOTAL_TOKENS = 487526748 + 91858179 + 37096301; // 616481228
 
 // Per-day combined costs in the window (jq group_by(.period) over the 3 files):
-//   2026-06-25 → 1.847776 (local only; mm starts 06-28, clawd 06-29)
+//   2026-06-25 → 1.847776 (laptop only; workstation starts 06-28, buildbox 06-29)
 //   2026-06-29 → 152.18387025000004
 //   2026-07-01 → 746.3380120999982   (max — mostExpensiveDay)
 const DAY_0625_COMBINED = 1.847776;
 const DAY_0629_COMBINED = 152.18387025000004;
 const DAY_0701_COMBINED = 746.3380120999982;
 
-// local's 2026-06-25 unified row (the only host active that day):
+// laptop's 2026-06-25 unified row (the only host active that day):
 //   {totalCost: 4.61944, inputTokens: 273192, outputTokens: 4884,
 //    cacheCreationTokens: 0, cacheReadTokens: 670592, totalTokens: 948668}
 const DAY_0625_INPUT = 273192;
@@ -93,7 +93,7 @@ const DAY_0625_CACHE_READ = 670592;
 const PREV_W_COMBINED_COST = 848.6039813500001;
 
 /*
- * hermes (clawd only) over 2026-06-01..2026-07-01, derived with jq from
+ * hermes (buildbox only) over 2026-06-01..2026-07-01, derived with jq from
  * unified.json's hermes slices:
  *   cost 69.99167116999999 across 9 active days;
  *   inputTokens 5597281, outputTokens 203913, cacheCreationTokens 0,
@@ -113,8 +113,8 @@ const HERMES_MAY_COST = 234.89320684999993;
 
 // July MTD for all hosts/agents with today = 2026-07-02 (MTD = 07-01..07-02
 // inclusive). CORRECTION (verified against the fixtures with jq): the real
-// daily fixtures DO contain 2026-07-02 rows — local 14.287603 and mm 2.37266
-// (clawd has none) — so combined July MTD is NOT just the 07-01 day cost:
+// daily fixtures DO contain 2026-07-02 rows — laptop 14.287603 and workstation 2.37266
+// (buildbox has none) — so combined July MTD is NOT just the 07-01 day cost:
 //   794.9833840999981 + 14.287603 + 2.37266 = 811.6436470999981
 // (kpi-compare.test.ts's hand ledger confirms MTD includes today's rows.)
 const COMBINED_JULY_MTD = 1320.2540432499975;
@@ -315,14 +315,14 @@ function mapAgentSlice(raw: RawAgentSlice, date: string): AgentDailyRow {
   };
 }
 
-const localDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
-  "real/local/unified.json",
+const laptopDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
+  "real/laptop/unified.json",
 );
-const mmDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
-  "real/mm/unified.json",
+const workstationDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
+  "real/workstation/unified.json",
 );
-const clawdDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
-  "real/clawd/unified.json",
+const buildboxDailyRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
+  "real/buildbox/unified.json",
 );
 const hugeCacheReadRaw = await loadFixture<{ daily: RawUnifiedDailyRow[] }>(
   "synthetic/huge-cache-read.json",
@@ -345,19 +345,19 @@ function mappedAgentDaily(rows: RawUnifiedDailyRow[]): Record<string, AgentDaily
 function realDataset(): MergedDataset {
   return mkDataset(
     [
-      mkHost("local", "MacBook Pro", {
-        daily: localDailyRaw.daily.map(mapUnifiedRow),
-        agentDaily: mappedAgentDaily(localDailyRaw.daily),
+      mkHost("laptop", "Laptop", {
+        daily: laptopDailyRaw.daily.map(mapUnifiedRow),
+        agentDaily: mappedAgentDaily(laptopDailyRaw.daily),
         agents: ["claude", "codex", "droid", "omp", "opencode", "pi"],
       }),
-      mkHost("mm", "Mac mini (ben)", {
-        daily: mmDailyRaw.daily.map(mapUnifiedRow),
-        agentDaily: mappedAgentDaily(mmDailyRaw.daily),
+      mkHost("workstation", "Workstation", {
+        daily: workstationDailyRaw.daily.map(mapUnifiedRow),
+        agentDaily: mappedAgentDaily(workstationDailyRaw.daily),
         agents: ["claude", "codex", "droid", "opencode", "pi"],
       }),
-      mkHost("clawd", "Mac mini (clawd)", {
-        daily: clawdDailyRaw.daily.map(mapUnifiedRow),
-        agentDaily: mappedAgentDaily(clawdDailyRaw.daily),
+      mkHost("buildbox", "Build box", {
+        daily: buildboxDailyRaw.daily.map(mapUnifiedRow),
+        agentDaily: mappedAgentDaily(buildboxDailyRaw.daily),
         agents: ["claude", "codex", "gemini", "hermes", "pi"],
       }),
     ],
@@ -414,9 +414,9 @@ describe("resolveUsageFilter", () => {
   });
 
   test("hosts list: trimmed, empties dropped, duplicates removed, order kept", () => {
-    const r = resolveUsageFilter({ hosts: " local , mm ,,local " }, TODAY);
+    const r = resolveUsageFilter({ hosts: " laptop , workstation ,,laptop " }, TODAY);
     if (!r.ok) throw new Error(r.error);
-    expect(r.filter.hosts).toEqual(["local", "mm"]);
+    expect(r.filter.hosts).toEqual(["laptop", "workstation"]);
   });
 
   test("empty / whitespace-only hosts and agents params mean all (null)", () => {
@@ -678,7 +678,7 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
     const f = run().filter;
     expect(f.allHosts).toBe(true);
     expect(f.allAgents).toBe(true);
-    expect([...f.hosts].sort()).toEqual(["clawd", "local", "mm"]);
+    expect([...f.hosts].sort()).toEqual(["buildbox", "laptop", "workstation"]);
     expect([...f.agents].sort()).toEqual(ALL_REAL_AGENTS);
     expect(f.from).toBe("2026-06-25");
     expect(f.to).toBe("2026-07-01");
@@ -696,7 +696,7 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
     expect(k.totalTokens.value).toBe(COMBINED_W_TOTAL_TOKENS);
     // divides by CALENDAR days (7), not active rows
     expect(k.dailyAverageCost.value).toBeCloseTo(COMBINED_W_COST / 7, 6);
-    expect(k.activeDays.value).toBe(7); // local has usage every day of the window
+    expect(k.activeDays.value).toBe(7); // laptop has usage every day of the window
   });
 
   test("KPI comparison vs the fully-covered previous period 2026-06-18..2026-06-24", () => {
@@ -735,16 +735,16 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
     expect(s.exact).toBe(true);
     expect(s.points.length).toBe(7);
     const ids = s.keys.map((k) => k.id).sort();
-    expect(ids).toEqual(["clawd", "local", "mm"]);
+    expect(ids).toEqual(["buildbox", "laptop", "workstation"]);
     for (const k of s.keys) expect(k.kind).toBe("host");
     const byId = new Map(s.keys.map((k) => [k.id, k]));
-    expect(byId.get("local")!.label).toBe("MacBook Pro");
-    // 2026-06-25: only local has usage; mm/clawd zero-filled on the point
+    expect(byId.get("laptop")!.label).toBe("Laptop");
+    // 2026-06-25: only laptop has usage; workstation/buildbox zero-filled on the point
     const p0 = s.points[0]!;
     expect(p0.date).toBe("2026-06-25");
-    expect(p0.values["local"]).toBeCloseTo(DAY_0625_COMBINED, 6);
-    expect(p0.values["mm"]).toBe(0);
-    expect(p0.values["clawd"]).toBe(0);
+    expect(p0.values["laptop"]).toBeCloseTo(DAY_0625_COMBINED, 6);
+    expect(p0.values["workstation"]).toBe(0);
+    expect(p0.values["buildbox"]).toBe(0);
     expect(p0.total).toBeCloseTo(DAY_0625_COMBINED, 6);
     // 2026-06-29: all three hosts contribute
     const p4 = s.points[4]!;
@@ -769,12 +769,12 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
       expect(p.combined).toBeCloseTo(hostSum, 6);
     }
     expect(c.points[6]!.combined).toBeCloseTo(COMBINED_W_COST, 6);
-    expect(c.points[6]!.byHost["local"]).toBeCloseTo(LOCAL_W_COST, 6);
-    expect(c.points[6]!.byHost["mm"]).toBeCloseTo(MM_W_COST, 6);
-    expect(c.points[6]!.byHost["clawd"]).toBeCloseTo(CLAWD_W_COST, 6);
+    expect(c.points[6]!.byHost["laptop"]).toBeCloseTo(LAPTOP_W_COST, 6);
+    expect(c.points[6]!.byHost["workstation"]).toBeCloseTo(WORKSTATION_W_COST, 6);
+    expect(c.points[6]!.byHost["buildbox"]).toBeCloseTo(BUILDBOX_W_COST, 6);
   });
 
-  test("token composition: local-only 2026-06-25 shows that day's four classes", () => {
+  test("token composition: laptop-only 2026-06-25 shows that day's four classes", () => {
     const tc = run().charts.tokenComposition;
     expect(tc.points.length).toBe(7);
     const p0 = tc.points[0]!;
@@ -787,12 +787,12 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
 
   test("byHost breakdown: cost desc, shares are fractions of total, sparkline on axis", () => {
     const rows = run().tables.byHost;
-    expect(rows.map((r) => r.key)).toEqual(["local", "mm", "clawd"]);
-    expect(rows[0]!.cost).toBeCloseTo(LOCAL_W_COST, 6);
-    expect(rows[1]!.cost).toBeCloseTo(MM_W_COST, 6);
-    expect(rows[2]!.cost).toBeCloseTo(CLAWD_W_COST, 6);
-    expect(rows[0]!.share).toBeCloseTo(LOCAL_W_COST / COMBINED_W_COST, 9);
-    expect(rows[2]!.share).toBeCloseTo(CLAWD_W_COST / COMBINED_W_COST, 9);
+    expect(rows.map((r) => r.key)).toEqual(["laptop", "workstation", "buildbox"]);
+    expect(rows[0]!.cost).toBeCloseTo(LAPTOP_W_COST, 6);
+    expect(rows[1]!.cost).toBeCloseTo(WORKSTATION_W_COST, 6);
+    expect(rows[2]!.cost).toBeCloseTo(BUILDBOX_W_COST, 6);
+    expect(rows[0]!.share).toBeCloseTo(LAPTOP_W_COST / COMBINED_W_COST, 9);
+    expect(rows[2]!.share).toBeCloseTo(BUILDBOX_W_COST / COMBINED_W_COST, 9);
     const shareSum = rows.reduce((a, r) => a + r.share, 0);
     expect(shareSum).toBeCloseTo(1, 9);
     for (const r of rows) {
@@ -800,7 +800,7 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
       const sparkSum = r.sparkline.reduce((a, b) => a + b, 0);
       expect(sparkSum).toBeCloseTo(r.cost, 6);
     }
-    // sparkline aligns with the axis: mm has no usage before 2026-06-28
+    // sparkline aligns with the axis: workstation has no usage before 2026-06-28
     expect(rows[1]!.sparkline[0]).toBe(0);
     expect(rows[1]!.sparkline[1]).toBe(0);
     expect(rows[1]!.sparkline[2]).toBe(0);
@@ -808,8 +808,8 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
 
   test("availableHosts lists ALL configured hosts; availableAgents sorted asc", () => {
     const r = run();
-    expect(r.availableHosts.map((h) => h.id)).toEqual(["local", "mm", "clawd"]);
-    expect(r.availableHosts[0]!.label).toBe("MacBook Pro");
+    expect(r.availableHosts.map((h) => h.id)).toEqual(["laptop", "workstation", "buildbox"]);
+    expect(r.availableHosts[0]!.label).toBe("Laptop");
     expect(r.availableAgents).toEqual(ALL_REAL_AGENTS);
   });
 });
@@ -821,24 +821,24 @@ describe("computeUsage: real fixtures, all hosts/agents, 2026-06-25..2026-07-01"
 describe("computeUsage: host subset filters (real fixtures)", () => {
   const window = { from: "2026-06-25", to: "2026-07-01" };
 
-  test("hosts=[local] restricts totals to local's unified daily", () => {
+  test("hosts=[laptop] restricts totals to laptop's unified daily", () => {
     const r = computeUsage(
       realDataset(),
-      { ...window, hosts: ["local"], agents: null },
+      { ...window, hosts: ["laptop"], agents: null },
       OPTS,
     );
-    expect(r.totals.cost).toBeCloseTo(LOCAL_W_COST, 6);
+    expect(r.totals.cost).toBeCloseTo(LAPTOP_W_COST, 6);
     expect(r.filter.allHosts).toBe(false);
-    expect(r.filter.hosts).toEqual(["local"]);
+    expect(r.filter.hosts).toEqual(["laptop"]);
   });
 
-  test("hosts=[mm,clawd] adds exactly those two hosts", () => {
+  test("hosts=[workstation,buildbox] adds exactly those two hosts", () => {
     const r = computeUsage(
       realDataset(),
-      { ...window, hosts: ["mm", "clawd"], agents: null },
+      { ...window, hosts: ["workstation", "buildbox"], agents: null },
       OPTS,
     );
-    expect(r.totals.cost).toBeCloseTo(MM_W_COST + CLAWD_W_COST, 6);
+    expect(r.totals.cost).toBeCloseTo(WORKSTATION_W_COST + BUILDBOX_W_COST, 6);
   });
 
   test("an unknown host id resolves to an empty intersection → all-zero response", () => {
@@ -898,9 +898,9 @@ describe("computeUsage: agents=[hermes] over 2026-06-01..2026-07-01 (real fixtur
   };
   const run = () => computeUsage(realDataset(), filter, OPTS);
 
-  test("totals come from clawd's hermes agent-daily rows; local+mm contribute $0", () => {
+  test("totals come from buildbox's hermes agent-daily rows; laptop+workstation contribute $0", () => {
     const t = run().totals;
-    // jq over clawd unified daily hermes slices, dates 06-01..07-01
+    // jq over buildbox unified daily hermes slices, dates 06-01..07-01
     expect(t.cost).toBeCloseTo(HERMES_JUNE_COST, 6); // ≈ the $55.05 anchor
     expect(t.inputTokens).toBe(5597281);
     expect(t.outputTokens).toBe(203913);
@@ -950,9 +950,9 @@ describe("computeUsage: agents=[hermes] over 2026-06-01..2026-07-01 (real fixtur
     expect(p!.projectedCost).toBeCloseTo((HERMES_JULY_MTD / 2) * 31, 9);
   });
 
-  test("host stack keeps only clawd (all-zero local/mm keys omitted)", () => {
+  test("host stack keeps only buildbox (all-zero laptop/workstation keys omitted)", () => {
     const s = run().charts.dailyCostByHost;
-    expect(s.keys.map((k) => k.id)).toEqual(["clawd"]);
+    expect(s.keys.map((k) => k.id)).toEqual(["buildbox"]);
     const total = s.points.reduce((a, p) => a + p.total, 0);
     expect(total).toBeCloseTo(HERMES_JUNE_COST, 6);
   });

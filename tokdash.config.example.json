@@ -9,15 +9,7 @@
       "color": "#7c8cf8",
       "enabled": true,
       "ssh": null,
-      "ccusageCmd": "bunx ccusage@latest"
-    },
-    {
-      "id": "workstation",
-      "label": "Workstation (bun, via SSH)",
-      "color": "#4ec9b0",
-      "enabled": true,
-      "ssh": "workstation",
-      "ccusageCmd": "~/.bun/bin/bunx ccusage@latest",
+      "ccusageCmd": "bunx ccusage@latest",
       "extraSources": [
         {
           "type": "pi-jsonl",
@@ -25,6 +17,14 @@
           "path": "~/.omp/agent/sessions"
         }
       ]
+    },
+    {
+      "id": "workstation",
+      "label": "Workstation (bun, via SSH)",
+      "color": "#4ec9b0",
+      "enabled": true,
+      "ssh": "workstation",
+      "ccusageCmd": "~/.bun/bin/bunx ccusage@latest"
     },
     {
       "id": "buildbox",

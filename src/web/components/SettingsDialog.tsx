@@ -396,7 +396,7 @@ function HostForm({
             className="field t-mono"
             value={form.ssh}
             onChange={(e) => set("ssh", e.target.value)}
-            placeholder="mm"
+            placeholder="workstation"
           />
         </label>
       </div>

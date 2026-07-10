@@ -17,7 +17,7 @@
  * in the authoring notes) — that is the reference the formatter must match, not
  * the formatter's own output. Token/relative-time/date expectations are
  * hand-constructed from the contract with obvious closed-form answers. Fixture
- * magnitudes (huge-cache-read.json, real/local/unified.json totals) are pulled in
+ * magnitudes (huge-cache-read.json, real/laptop/unified.json totals) are pulled in
  * verbatim to prove the formatter survives 11–14-digit token counts and messy
  * unrounded float costs.
  *
@@ -46,7 +46,7 @@ import type { DateString } from "../src/shared/types";
 // and the currency formatter survive the largest real-shaped values.
 //   row 0: totalCost = 82.06393750000001, totalTokens = 82_066_994_312
 //   row 1: totalCost = 39.6598589700001,  totalTokens = 47_444_023_389_871
-// fixtures/real/local/unified.json → .totals:
+// fixtures/real/laptop/unified.json → .totals:
 //   totalCost = 9204.628823847195, totalTokens = 7_610_185_001
 const HUGE_ROW0_COST = 82.06393750000001;
 const HUGE_ROW0_TOTAL_TOKENS = 82_066_994_312; // 82.066…B
@@ -70,9 +70,9 @@ test("huge-cache-read fixture still carries the pinned magnitudes", async () => 
   expect(raw.daily[1]?.totalTokens).toBe(HUGE_ROW1_TOTAL_TOKENS);
 });
 
-test("real/local/unified.json totals still carry the pinned magnitudes", async () => {
+test("real/laptop/unified.json totals still carry the pinned magnitudes", async () => {
   const raw = (await Bun.file(
-    new URL("../fixtures/real/local/unified.json", import.meta.url),
+    new URL("../fixtures/real/laptop/unified.json", import.meta.url),
   ).json()) as { totals: { totalCost: number; totalTokens: number } };
   expect(raw.totals.totalCost).toBe(LOCAL_TOTALS_COST);
   expect(raw.totals.totalTokens).toBe(LOCAL_TOTALS_TOTAL_TOKENS);
@@ -108,7 +108,7 @@ describe("formatCurrency", () => {
   });
 
   test("rounds a large messy float up with grouping", () => {
-    // real/local/unified.json totals.totalCost = 9204.628823847195.
+    // real/laptop/unified.json totals.totalCost = 9204.628823847195.
     expect(formatCurrency(LOCAL_TOTALS_COST)).toBe("$9,204.63");
   });
 

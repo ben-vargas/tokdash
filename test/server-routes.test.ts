@@ -35,9 +35,9 @@ const BASE_CONFIG: AppConfig = {
   fetchWindowDays: 90,
   refreshIntervalMinutes: 15,
   hosts: [
-    { id: "local", label: "MacBook Pro", color: "#7c8cf8", enabled: true, ssh: null, ccusageCmd: "bunx ccusage@latest", extraSources: [{ type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" }] },
-    { id: "mm", label: "Mac mini (ben)", color: "#4ec9b0", enabled: true, ssh: "mm", ccusageCmd: "~/.bun/bin/bunx ccusage@latest", extraSources: [{ type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" }] },
-    { id: "clawd", label: "Mac mini (clawd)", color: "#e8a951", enabled: true, ssh: "clawd", ccusageCmd: "npx -y ccusage@latest" },
+    { id: "laptop", label: "Laptop", color: "#7c8cf8", enabled: true, ssh: null, ccusageCmd: "bunx ccusage@latest", extraSources: [{ type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" }] },
+    { id: "workstation", label: "Workstation", color: "#4ec9b0", enabled: true, ssh: "workstation", ccusageCmd: "~/.bun/bin/bunx ccusage@latest", extraSources: [{ type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" }] },
+    { id: "buildbox", label: "Build box", color: "#e8a951", enabled: true, ssh: "buildbox", ccusageCmd: "npx -y ccusage@latest" },
   ],
 };
 
@@ -113,8 +113,8 @@ describe("/api/config", () => {
       refreshIntervalMinutes: 15,
       hosts: [
         {
-          id: "local",
-          label: "Local",
+          id: "laptop",
+          label: "Laptop",
           color: "#7c8cf8",
           enabled: true,
           ssh: null,
@@ -299,7 +299,7 @@ describe("GET /api/usage", () => {
     const usage = usageResponseSchema.parse(body);
     // independent plain-arithmetic recomputation straight from the fixtures
     let expected = 0;
-    for (const host of ["local", "mm", "clawd"]) {
+    for (const host of ["laptop", "workstation", "buildbox"]) {
       const daily = JSON.parse(
         readFileSync(join(DEFAULT_FIXTURES_ROOT, host, "unified.json"), "utf8"),
       ) as { daily: { period: string; totalCost: number }[] };
@@ -314,7 +314,7 @@ describe("GET /api/usage", () => {
     expect(usage.filter).toEqual({
       from: "2026-06-01",
       to: "2026-07-01",
-      hosts: ["local", "mm", "clawd"],
+      hosts: ["laptop", "workstation", "buildbox"],
       agents: usage.availableAgents,
       allHosts: true,
       allAgents: true,
@@ -322,7 +322,7 @@ describe("GET /api/usage", () => {
     expect(usage.dateAxis.length).toBe(31);
     expect(usage.dateAxis[0]).toBe("2026-06-01");
     expect(usage.dateAxis.at(-1)).toBe("2026-07-01");
-    expect(usage.availableHosts.map((h) => h.id)).toEqual(["local", "mm", "clawd"]);
+    expect(usage.availableHosts.map((h) => h.id)).toEqual(["laptop", "workstation", "buildbox"]);
   });
 
   test("response is byte-identical to computeUsage over the same snapshots (single aggregation path)", async () => {
@@ -341,28 +341,28 @@ describe("GET /api/usage", () => {
     expect(body).toEqual(JSON.parse(JSON.stringify(direct)));
   });
 
-  test("hosts filter: clawd only", async () => {
-    const { body } = await getJson("/api/usage?from=2026-06-01&to=2026-07-01&hosts=clawd");
+  test("hosts filter: buildbox only", async () => {
+    const { body } = await getJson("/api/usage?from=2026-06-01&to=2026-07-01&hosts=buildbox");
     const usage = usageResponseSchema.parse(body);
     const daily = JSON.parse(
-      readFileSync(join(DEFAULT_FIXTURES_ROOT, "clawd", "unified.json"), "utf8"),
+      readFileSync(join(DEFAULT_FIXTURES_ROOT, "buildbox", "unified.json"), "utf8"),
     ) as { daily: { period: string; totalCost: number }[] };
     let expected = 0;
     for (const row of daily.daily) {
       if (row.period >= "2026-06-01" && row.period <= "2026-07-01") expected += row.totalCost;
     }
     expect(usage.totals.cost).toBeCloseTo(expected, 6);
-    expect(usage.filter.hosts).toEqual(["clawd"]);
+    expect(usage.filter.hosts).toEqual(["buildbox"]);
     expect(usage.filter.allHosts).toBe(false);
   });
 
-  test("agents filter: hermes on clawd matches unified daily slices", async () => {
+  test("agents filter: hermes on buildbox matches unified daily slices", async () => {
     const { body } = await getJson(
-      "/api/usage?from=2026-06-01&to=2026-07-01&hosts=clawd&agents=hermes",
+      "/api/usage?from=2026-06-01&to=2026-07-01&hosts=buildbox&agents=hermes",
     );
     const usage = usageResponseSchema.parse(body);
     const agentDaily = JSON.parse(
-      readFileSync(join(DEFAULT_FIXTURES_ROOT, "clawd", "unified.json"), "utf8"),
+      readFileSync(join(DEFAULT_FIXTURES_ROOT, "buildbox", "unified.json"), "utf8"),
     ) as {
       daily: Array<{
         period: string;
@@ -378,7 +378,7 @@ describe("GET /api/usage", () => {
     expect(usage.totals.cost).toBeCloseTo(69.99167117, 6);
     expect(usage.filter.allAgents).toBe(false);
     expect(usage.filter.agents).toEqual(["hermes"]);
-    // hermes-only across ALL hosts contributes ~nothing from local/mm
+    // hermes-only across ALL hosts contributes ~nothing from laptop/workstation
     const { body: allHosts } = await getJson(
       "/api/usage?from=2026-06-01&to=2026-07-01&agents=hermes",
     );
@@ -396,11 +396,11 @@ describe("GET /api/usage", () => {
 
   test("comma-separated lists are trimmed and deduped; unknown ids are not errors", async () => {
     const { status, body } = await getJson(
-      "/api/usage?hosts=%20local%20,local,ghost&agents=claude,%20claude",
+      "/api/usage?hosts=%20laptop%20,laptop,ghost&agents=claude,%20claude",
     );
     expect(status).toBe(200);
     const usage = usageResponseSchema.parse(body);
-    expect(usage.filter.hosts).toEqual(["local"]); // ghost isn't configured
+    expect(usage.filter.hosts).toEqual(["laptop"]); // ghost isn't configured
     expect(usage.filter.agents).toEqual(["claude"]);
   });
 
@@ -413,12 +413,12 @@ describe("GET /api/usage", () => {
   });
 
   test("a `from` older than the cached window kicks a background wider refetch", async () => {
-    const windowBefore = store.get("local")?.window.from;
+    const windowBefore = store.get("laptop")?.window.from;
     expect(windowBefore).toBe("2026-04-03"); // today − 90
     const { status } = await getJson("/api/usage?from=2026-02-01&to=2026-07-01");
     expect(status).toBe(200); // served from cache immediately
     await refresh.refresh().promise; // join the background refetch
-    expect(store.get("local")?.window.from).toBe("2026-02-01");
+    expect(store.get("laptop")?.window.from).toBe("2026-02-01");
   });
 });
 
@@ -466,7 +466,7 @@ describe("GET /api/status", () => {
       expect(host.durations.length).toBe(1); // one unified invocation
       expect(host.agents.length).toBeGreaterThan(0);
     }
-    expect(parsed.hosts.find((h) => h.hostId === "clawd")?.agents).toContain("hermes");
+    expect(parsed.hosts.find((h) => h.hostId === "buildbox")?.agents).toContain("hermes");
   });
 
   test("a failed host shows an error state (and /api/usage still serves the rest)", async () => {
@@ -486,7 +486,7 @@ describe("GET /api/status", () => {
       expect(ghost?.freshness).toBe("error");
       expect(ghost?.error?.kind).toBe("unreachable");
       expect(ghost?.error?.stderrTail).toContain("Could not resolve hostname");
-      expect(parsed.hosts.find((h) => h.hostId === "local")?.freshness).toBe("fresh");
+      expect(parsed.hosts.find((h) => h.hostId === "laptop")?.freshness).toBe("fresh");
 
       const { body: usage } = await getJson("/api/usage?from=2026-06-01&to=2026-07-01");
       const parsedUsage = usageResponseSchema.parse(usage);
@@ -502,7 +502,7 @@ describe("GET /api/status", () => {
 
 describe("POST /api/hosts/:id/test", () => {
   test("reports round-trip, version, and detected agents from the snapshot", async () => {
-    const res = await app.request("/api/hosts/clawd/test", { method: "POST" });
+    const res = await app.request("/api/hosts/buildbox/test", { method: "POST" });
     expect(res.status).toBe(200);
     const body = testConnectionResponseSchema.parse(await res.json());
     expect(body.ok).toBe(true);

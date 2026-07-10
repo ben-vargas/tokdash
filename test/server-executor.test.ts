@@ -20,8 +20,8 @@ const OPTS = {
   timezone: "America/Boise",
 };
 const HOST: HostConfig = {
-  id: "local",
-  label: "Local",
+  id: "laptop",
+  label: "Laptop",
   color: "#7c8cf8",
   enabled: true,
   ssh: null,
@@ -31,7 +31,7 @@ const HOST: HostConfig = {
 describe("LocalExecutor", () => {
   test("captures stdout/stderr separately and reports exit code", async () => {
     const res = await new LocalExecutor().run({
-      hostId: "local",
+      hostId: "laptop",
       ssh: null,
       command: "printf 'clean'; printf 'noise' 1>&2; exit 3",
       timeoutMs: 5_000,
@@ -43,7 +43,7 @@ describe("LocalExecutor", () => {
 
   test("kills a timed-out process", async () => {
     const res = await new LocalExecutor().run({
-      hostId: "local",
+      hostId: "laptop",
       ssh: null,
       command: "sleep 30",
       timeoutMs: 100,
@@ -54,13 +54,13 @@ describe("LocalExecutor", () => {
 });
 
 test("sshArgv keeps the remote command as one argument", () => {
-  expect(sshArgv("clawd", "x --sections daily,monthly,session")).toEqual([
+  expect(sshArgv("buildbox", "x --sections daily,monthly,session")).toEqual([
     "ssh",
     "-o",
     "BatchMode=yes",
     "-o",
     "ConnectTimeout=10",
-    "clawd",
+    "buildbox",
     "x --sections daily,monthly,session",
   ]);
 });
@@ -71,14 +71,14 @@ describe("MockExecutor", () => {
   test("replays unified.json for a command containing --sections", async () => {
     const built = buildUnifiedFetchCommand(HOST, OPTS);
     const res = await mock.run({
-      hostId: "local",
+      hostId: "laptop",
       ssh: null,
       command: built.command,
       timeoutMs: 180_000,
     });
     expect(res.exitCode).toBe(0);
     expect(res.stdout).toBe(
-      await Bun.file(join(DEFAULT_FIXTURES_ROOT, "local", "unified.json")).text(),
+      await Bun.file(join(DEFAULT_FIXTURES_ROOT, "laptop", "unified.json")).text(),
     );
     expect(() => JSON.parse(res.stdout)).not.toThrow();
     expect(res.stderr.length).toBeGreaterThan(0);
@@ -96,7 +96,7 @@ describe("MockExecutor", () => {
     );
     expect(built.command).toContain("CFG=$(mktemp)");
     const res = await mock.run({
-      hostId: "local",
+      hostId: "laptop",
       ssh: null,
       command: built.command,
       timeoutMs: 180_000,
@@ -107,14 +107,14 @@ describe("MockExecutor", () => {
 
   test("answers version and rejects any other invocation", async () => {
     const version = await mock.run({
-      hostId: "mm",
-      ssh: "mm",
+      hostId: "workstation",
+      ssh: "workstation",
       command: "bunx ccusage@latest --version",
       timeoutMs: 45_000,
     });
     expect(version.stdout).toContain(`ccusage ${MOCK_CCUSAGE_VERSION}`);
     const bad = await mock.run({
-      hostId: "local",
+      hostId: "laptop",
       ssh: null,
       command: "bunx ccusage@latest daily --json",
       timeoutMs: 45_000,

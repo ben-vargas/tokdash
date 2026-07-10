@@ -66,8 +66,8 @@ a couple of hosts in place.
 bun run build
 bun start                 # http://127.0.0.1:4114
 
-# Demo / offline mode: replay committed fixtures instead of shelling out — no SSH, near-zero latency
-MOCK=1 bun start
+# Demo / offline mode: replay committed fixtures — no config of your own, no SSH, near-zero latency
+MOCK=1 TOKDASH_CONFIG=tokdash.config.example.json bun start
 
 # Tests
 bun test
@@ -111,10 +111,37 @@ the three common host shapes:
   "fetchWindowDays": 90,
   "refreshIntervalMinutes": 5,
   "hosts": [
-    {"id": "laptop", "label": "Laptop (local)", "color": "#7c8cf8", "enabled": true, "ssh": null, "ccusageCmd": "bunx ccusage@latest"},
-    {"id": "workstation", "label": "Workstation (bun, via SSH)", "color": "#4ec9b0", "enabled": true, "ssh": "workstation", "ccusageCmd": "~/.bun/bin/bunx ccusage@latest",
-     "extraSources": [{"type": "pi-jsonl", "agent": "omp", "path": "~/.omp/agent/sessions"}]},
-    {"id": "buildbox", "label": "Build box (nvm node, via SSH)", "color": "#e8a951", "enabled": true, "ssh": "buildbox", "ccusageCmd": "PATH=\"$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node | sort -V | tail -1)/bin:$PATH\" npx -y ccusage@latest"}
+    {
+      "id": "laptop",
+      "label": "Laptop (local)",
+      "color": "#7c8cf8",
+      "enabled": true,
+      "ssh": null,
+      "ccusageCmd": "bunx ccusage@latest",
+      "extraSources": [
+        {
+          "type": "pi-jsonl",
+          "agent": "omp",
+          "path": "~/.omp/agent/sessions"
+        }
+      ]
+    },
+    {
+      "id": "workstation",
+      "label": "Workstation (bun, via SSH)",
+      "color": "#4ec9b0",
+      "enabled": true,
+      "ssh": "workstation",
+      "ccusageCmd": "~/.bun/bin/bunx ccusage@latest"
+    },
+    {
+      "id": "buildbox",
+      "label": "Build box (nvm node, via SSH)",
+      "color": "#e8a951",
+      "enabled": true,
+      "ssh": "buildbox",
+      "ccusageCmd": "PATH=\"$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node | sort -V | tail -1)/bin:$PATH\" npx -y ccusage@latest"
+    }
   ]
 }
 ```
@@ -319,7 +346,7 @@ test/         bun:test suites
   expected `/api/usage` totals straight from the fixture JSON with plain arithmetic (it imports nothing
   from `src/`, so the check isn't circular), then asserts equality to the cent:
   ```bash
-  MOCK=1 PORT=4114 bun start &          # background
+  MOCK=1 TOKDASH_CONFIG=tokdash.config.example.json PORT=4114 bun start &  # background
   PORT=4114 bun scripts/verify-aggregation.ts
   ```
 
@@ -332,3 +359,7 @@ or alerting; editing ccusage's underlying data; Windows hosts; and ccusage's Cla
 ## Contributing
 
 Issues and pull requests are welcome.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

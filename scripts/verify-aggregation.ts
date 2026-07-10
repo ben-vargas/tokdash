@@ -32,7 +32,7 @@ import { z } from "zod";
 const PORT = Number(process.env.PORT) || 4114;
 const BASE = `http://127.0.0.1:${PORT}`;
 const FIXTURES = join(import.meta.dir, "..", "fixtures", "real");
-const ALL_HOSTS = ["local", "mm", "clawd"] as const;
+const ALL_HOSTS = ["laptop", "workstation", "buildbox"] as const;
 
 /* ---------------------------------------------------------------- */
 /* (b) Inline wire-contract schema — deliberately NOT imported from   */
@@ -266,23 +266,23 @@ const combos: Combo[] = [
     excludedHosts: [],
   },
   {
-    name: "C2 host subset local,mm    2026-06-01..2026-06-30",
-    params: { from: "2026-06-01", to: "2026-06-30", hosts: "local,mm" },
+    name: "C2 host subset laptop,workstation    2026-06-01..2026-06-30",
+    params: { from: "2026-06-01", to: "2026-06-30", hosts: "laptop,workstation" },
     expected: () =>
-      hostDailyCost("local", "2026-06-01", "2026-06-30") +
-      hostDailyCost("mm", "2026-06-01", "2026-06-30"),
-    excludedHosts: ["clawd"],
+      hostDailyCost("laptop", "2026-06-01", "2026-06-30") +
+      hostDailyCost("workstation", "2026-06-01", "2026-06-30"),
+    excludedHosts: ["buildbox"],
   },
   {
-    name: "C3 clawd + agent hermes    2026-06-01..2026-06-30",
+    name: "C3 buildbox + agent hermes    2026-06-01..2026-06-30",
     params: {
       from: "2026-06-01",
       to: "2026-06-30",
-      hosts: "clawd",
+      hosts: "buildbox",
       agents: "hermes",
     },
-    expected: () => agentDailyCost("clawd", "hermes", "2026-06-01", "2026-06-30"),
-    excludedHosts: ["local", "mm"],
+    expected: () => agentDailyCost("buildbox", "hermes", "2026-06-01", "2026-06-30"),
+    excludedHosts: ["laptop", "workstation"],
   },
   {
     name: "C4 all hosts, agent claude 2026-06-10..2026-06-20",

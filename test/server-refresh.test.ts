@@ -29,9 +29,9 @@ afterEach(() => {
 const NOW = () => new Date("2026-07-10T18:00:00.000Z");
 const WINDOW = { from: "2026-04-11", to: "2026-07-10" };
 
-const LOCAL: HostConfig = {
-  id: "local",
-  label: "MacBook Pro",
+const LAPTOP: HostConfig = {
+  id: "laptop",
+  label: "Laptop",
   color: "#7c8cf8",
   enabled: true,
   ssh: null,
@@ -40,20 +40,20 @@ const LOCAL: HostConfig = {
     { type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" },
   ],
 };
-const CLAWD: HostConfig = {
-  id: "clawd",
-  label: "Mac mini (clawd)",
+const BUILDBOX: HostConfig = {
+  id: "buildbox",
+  label: "Build box",
   color: "#e8a951",
   enabled: true,
-  ssh: "clawd",
+  ssh: "buildbox",
   ccusageCmd: "npx -y ccusage@latest",
 };
-const MM: HostConfig = {
-  id: "mm",
-  label: "Mac mini (ben)",
+const WORKSTATION: HostConfig = {
+  id: "workstation",
+  label: "Workstation",
   color: "#4ec9b0",
   enabled: true,
-  ssh: "mm",
+  ssh: "workstation",
   ccusageCmd: "~/.bun/bin/bunx ccusage@latest",
   extraSources: [
     { type: "pi-jsonl", agent: "omp", path: "/Users/ben/.omp/agent/sessions" },
@@ -88,8 +88,8 @@ function failingExecutor(
 describe("fetchHostSnapshot", () => {
   const mock = new MockExecutor(DEFAULT_FIXTURES_ROOT);
 
-  test("uses exactly one unified CommandRecord and derives local agentDaily keys", async () => {
-    const snap = await fetch(LOCAL, mock);
+  test("uses exactly one unified CommandRecord and derives laptop agentDaily keys", async () => {
+    const snap = await fetch(LAPTOP, mock);
     expect(snap.error).toBeNull();
     expect(snap.commands).toHaveLength(1);
     expect(snap.commands[0]?.name).toBe("unified");
@@ -106,7 +106,7 @@ describe("fetchHostSnapshot", () => {
   });
 
   test("omp slice has real per-model costs with bare slugs", async () => {
-    const snap = await fetch(LOCAL, mock);
+    const snap = await fetch(LAPTOP, mock);
     const rows = snap.data.agentDaily["omp"] ?? [];
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.some((row) => (row.modelBreakdowns ?? []).some((b) => b.cost > 0))).toBe(
@@ -116,8 +116,8 @@ describe("fetchHostSnapshot", () => {
     expect(rows.every((row) => row.dialect === "unified")).toBe(true);
   });
 
-  test("mm silently omits its missing configured omp store", async () => {
-    const snap = await fetch(MM, mock);
+  test("workstation silently omits its missing configured omp store", async () => {
+    const snap = await fetch(WORKSTATION, mock);
     expect(snap.error).toBeNull();
     expect(snap.data.agentDaily["omp"]).toBeUndefined();
     expect(snap.data.agents).not.toContain("omp");
@@ -128,8 +128,8 @@ describe("fetchHostSnapshot", () => {
     ).toBe(false);
   });
 
-  test("real local date total equals the sum of agent-slice model costs", async () => {
-    const snap = await fetch(LOCAL, mock);
+  test("real laptop date total equals the sum of agent-slice model costs", async () => {
+    const snap = await fetch(LAPTOP, mock);
     const date = "2026-07-01";
     const hostCost = snap.data.daily.find((row) => row.date === date)?.cost;
     const modelCost = Object.values(snap.data.agentDaily)
@@ -181,7 +181,7 @@ describe("fetchHostSnapshot", () => {
         timedOut: false,
       }),
     };
-    const snap = await fetch(LOCAL, executor);
+    const snap = await fetch(LAPTOP, executor);
     expect(
       snap.warnings.some(
         (w) => w.code === "unknown-agent" && w.context?.["agent"] === "omp",
@@ -196,7 +196,7 @@ describe("fetchHostSnapshot", () => {
   });
 
   test("garbled unified output degrades to the previous snapshot", async () => {
-    const good = await fetch(CLAWD, mock);
+    const good = await fetch(BUILDBOX, mock);
     const garbled: CommandExecutor = {
       run: async () => ({
         stdout: "Error: no JSON today",
@@ -206,7 +206,7 @@ describe("fetchHostSnapshot", () => {
         timedOut: false,
       }),
     };
-    const degraded = await fetchHostSnapshot(CLAWD, {
+    const degraded = await fetchHostSnapshot(BUILDBOX, {
       timezone: "America/Boise",
       window: WINDOW,
       executor: garbled,
@@ -231,17 +231,17 @@ describe("fetchHostSnapshot", () => {
         timedOut: false,
       }),
     };
-    const snap = await fetch(CLAWD, executor);
+    const snap = await fetch(BUILDBOX, executor);
     expect(snap.error?.kind).toBe("schema");
     expect(snap.data.daily).toEqual([]);
   });
 
   test("transport failures preserve the established tiers", async () => {
-    expect((await fetch(CLAWD, failingExecutor(255))).error?.kind).toBe(
+    expect((await fetch(BUILDBOX, failingExecutor(255))).error?.kind).toBe(
       "unreachable",
     );
-    expect((await fetch(CLAWD, failingExecutor(127))).error?.kind).toBe("exit");
-    expect((await fetch(CLAWD, failingExecutor(null, true))).error?.kind).toBe(
+    expect((await fetch(BUILDBOX, failingExecutor(127))).error?.kind).toBe("exit");
+    expect((await fetch(BUILDBOX, failingExecutor(null, true))).error?.kind).toBe(
       "timeout",
     );
   });
@@ -274,7 +274,7 @@ describe("RefreshManager", () => {
     timezone: "America/Boise",
     fetchWindowDays: 90,
     refreshIntervalMinutes: 15,
-    hosts: [LOCAL, CLAWD],
+    hosts: [LAPTOP, BUILDBOX],
   };
 
   test("single-flight refresh executes once per host", async () => {
@@ -306,8 +306,8 @@ describe("RefreshManager", () => {
     release();
     await first.promise;
     expect(runCount).toBe(2);
-    expect(store.get("local")?.commands).toHaveLength(1);
-    expect(store.get("clawd")?.commands).toHaveLength(1);
+    expect(store.get("laptop")?.commands).toHaveLength(1);
+    expect(store.get("buildbox")?.commands).toHaveLength(1);
   });
 
   test("requestWiderWindow reaches the one unified command", async () => {
@@ -347,6 +347,6 @@ describe("RefreshManager", () => {
       log: () => {},
     });
     await manager.refresh().promise;
-    expect(store.get("local")).toBeNull();
+    expect(store.get("laptop")).toBeNull();
   });
 });
