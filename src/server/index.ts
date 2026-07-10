@@ -7,7 +7,7 @@
  *                                  IDENTICALLY (mock snapshots go to
  *                                  .cache/snapshots-mock so live cache stays
  *                                  clean; override with TOKDASH_CACHE_DIR)
- *   TOKDASH_CONFIG=<path>          config file (default ./tokdash.config.json)
+ *   TOKDASH_CONFIG=<path>          config file override
  *   TOKDASH_AUTOREFRESH=0          pause the auto-refresh scheduler (G6);
  *                                  refreshIntervalMinutes <= 0 in config also
  *                                  disables it
@@ -23,19 +23,28 @@
  */
 
 import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { staleAfterMs } from "../shared/constants";
 import { SnapshotStore } from "./cache";
-import { requireConfig, readConfigFile, resolveConfigPath } from "./config";
+import { requireConfig, readConfigFile, resolveConfig } from "./config";
 import { createExecutor } from "./executor";
 import { RefreshManager } from "./refresh";
 import { createApp } from "./routes";
 
 const MOCK = process.env.MOCK === "1";
-const configPath = resolveConfigPath();
+const configResolution = resolveConfig();
+const configPath = configResolution.path;
+const snapshotDirName = MOCK ? "snapshots-mock" : "snapshots";
 const cacheDir = resolve(
   process.env.TOKDASH_CACHE_DIR ??
-    (MOCK ? ".cache/snapshots-mock" : ".cache/snapshots"),
+    (configResolution.source === "xdg"
+      ? join(
+          process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"),
+          "tokdash",
+          snapshotDirName,
+        )
+      : join(".cache", snapshotDirName)),
 );
 
 const executor = createExecutor();
@@ -66,6 +75,7 @@ console.log(
   `TokDash server listening on http://127.0.0.1:${server.port}` +
     (MOCK ? " (MOCK mode: replaying fixtures/real)" : ""),
 );
+console.log(`[startup] config: ${configPath} | cache: ${cacheDir}`);
 
 /* ---- initial refresh (background; awaited in MOCK for determinism) ---- */
 

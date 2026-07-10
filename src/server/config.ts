@@ -1,5 +1,5 @@
 /**
- * Config I/O. The file at TOKDASH_CONFIG (default ./tokdash.config.json) is
+ * Config I/O. The resolved config file is
  * re-read FRESHLY on every API request — it is tiny, and this makes hand
  * edits take effect without a restart. Writes (PUT /api/config) validate
  * first, then atomically rewrite the whole document (temp file + rename).
@@ -7,19 +7,39 @@
  * never a crash loop.
  */
 
-import { readFileSync } from "node:fs";
-import { rename, writeFile } from "node:fs/promises";
-import { posix, resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { mkdir, rename, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { dirname, join, posix, resolve } from "node:path";
 import { z } from "zod";
 import { KNOWN_HARNESS_SET } from "../shared/constants";
 import { isValidTimezone } from "../shared/dates";
 import { appConfigSchema } from "../shared/schemas";
 import type { AppConfig } from "../shared/types";
 
+export type ConfigResolution = {
+  path: string;
+  source: "env" | "cwd" | "xdg";
+};
+
+export function resolveConfig(
+  env: Record<string, string | undefined> = process.env,
+): ConfigResolution {
+  if (env["TOKDASH_CONFIG"] !== undefined) {
+    return { path: resolve(env["TOKDASH_CONFIG"]), source: "env" };
+  }
+
+  const cwdPath = resolve("tokdash.config.json");
+  if (existsSync(cwdPath)) return { path: cwdPath, source: "cwd" };
+
+  const configHome = env["XDG_CONFIG_HOME"] ?? join(homedir(), ".config");
+  return { path: resolve(configHome, "tokdash", "config.json"), source: "xdg" };
+}
+
 export function resolveConfigPath(
   env: Record<string, string | undefined> = process.env,
 ): string {
-  return resolve(env["TOKDASH_CONFIG"] ?? "tokdash.config.json");
+  return resolveConfig(env).path;
 }
 
 export type ConfigReadResult =
@@ -143,6 +163,7 @@ export async function writeConfigFile(
   const validated = validateConfig(config);
   if (!validated.ok) throw new Error(validated.error);
   const tmp = `${path}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}`;
+  await mkdir(dirname(path), { recursive: true });
   await writeFile(tmp, `${JSON.stringify(validated.config, null, 2)}\n`, "utf8");
   await rename(tmp, path);
   return validated.config;

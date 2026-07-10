@@ -44,8 +44,9 @@ color across every chart, chip, table, and status dot.
 
 ### Install
 
-Run TokDash from the directory where you want `tokdash.config.json` and `.cache/` to live. The
-zero-config in-app onboarding takes it from there.
+The installed CLI keeps its config in `~/.config/tokdash/config.json` and snapshots in
+`~/.cache/tokdash/snapshots`. The config is created by onboarding when you first save from the
+settings dialog or API.
 
 ```bash
 bunx @benvargas/tokdash
@@ -122,10 +123,11 @@ for the others; unified agent slices provide its real per-model costs.
 
 ## Configuration
 
-Config lives in **`tokdash.config.json`** at the repo root (override the path with `TOKDASH_CONFIG`),
-validated with zod. Everything below is also editable from the settings UI (gear icon) — the file and
-the UI are two views of the same document. Start from `tokdash.config.example.json`, which demonstrates
-the three common host shapes:
+The config path resolves in order from `TOKDASH_CONFIG`, then `./tokdash.config.json` when that file
+exists, then `$XDG_CONFIG_HOME/tokdash/config.json` (`~/.config/tokdash/config.json` when
+`XDG_CONFIG_HOME` is unset). Config is validated with zod. Everything below is also editable from the
+settings UI (gear icon) — the file and the UI are two views of the same document. Start from
+`tokdash.config.example.json`, which demonstrates the three common host shapes:
 
 ```json
 {
@@ -207,11 +209,13 @@ that host's single invocation. A missing path is silently absent. Store prefixes
 
 | Var | Default | Effect |
 |---|---|---|
-| `TOKDASH_CONFIG` | `./tokdash.config.json` | Path to the config file. |
+| `TOKDASH_CONFIG` | Cwd file if present, otherwise `$XDG_CONFIG_HOME/tokdash/config.json` | Path to the config file. |
 | `PORT` | `4114` | API / production server port (always bound to `127.0.0.1`). |
-| `TOKDASH_CACHE_DIR` | `.cache/snapshots` (`.cache/snapshots-mock` under `MOCK=1`) | Where per-host snapshots are read/written. |
+| `TOKDASH_CACHE_DIR` | Cwd `.cache/snapshots` for config overrides; otherwise `$XDG_CACHE_HOME/tokdash/snapshots` | Where per-host snapshots are read/written (`snapshots-mock` under `MOCK=1`). |
 | `TOKDASH_AUTOREFRESH` | (unset) | Set to `0` to pause the periodic auto-refresh **scheduler** (a one-time startup refresh may still fire for a stale cache). |
 | `MOCK` | (unset) | Set to `1` to replay `fixtures/real/<hostId>/` instead of shelling out. |
+
+`XDG_CONFIG_HOME` and `XDG_CACHE_HOME` default to `~/.config` and `~/.cache`, respectively.
 
 The config file is **re-read fresh on every API request** — it is tiny, so hand edits (add a host, flip
 `enabled`, change a color) take effect on the next request with no restart. `PUT /api/config` validates
