@@ -1,27 +1,60 @@
 {
   "name": "tokdash",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Multi-host ccusage dashboard — aggregate AI coding-agent usage and cost across machines over SSH",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ben-vargas/tokdash.git"
+  },
+  "homepage": "https://github.com/ben-vargas/tokdash#readme",
+  "bugs": {
+    "url": "https://github.com/ben-vargas/tokdash/issues"
+  },
+  "keywords": [
+    "ccusage",
+    "claude-code",
+    "ai-usage",
+    "dashboard",
+    "cost-tracking",
+    "ssh",
+    "bun"
+  ],
+  "bin": {
+    "tokdash": "./bin/tokdash.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src/server",
+    "src/shared",
+    "tokdash.config.example.json"
+  ],
   "type": "module",
   "scripts": {
     "dev": "bun scripts/dev.ts",
     "build": "vite build",
     "start": "bun src/server/index.ts",
-    "test": "bun test"
+    "test": "bun test",
+    "prepublishOnly": "bun run build && bun test"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.101.2",
     "hono": "^4.12.27",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "recharts": "^3.9.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@tanstack/react-query": "^5.101.2",
     "@tailwindcss/vite": "^4.3.2",
     "@types/bun": "^1.3.14",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "recharts": "^3.9.1",
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "vite": "^8.1.3"

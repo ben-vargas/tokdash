@@ -6,7 +6,7 @@
  */
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Hono } from "hono";
@@ -547,5 +547,45 @@ describe("unknown /api routes", () => {
     const { status, body } = await getJson("/api/definitely-not-a-route");
     expect(status).toBe(404);
     expect((body as { error: string }).error).toContain("no such API route");
+  });
+});
+
+/* ---------------------------- static files --------------------------- */
+
+describe("static SPA serving from an injected absolute distDir", () => {
+  let staticRoot: string;
+
+  beforeAll(() => {
+    staticRoot = mkdtempSync(join(tmpdir(), "tokdash-static-test-"));
+    const assetsDir = join(staticRoot, "assets");
+    mkdirSync(assetsDir);
+    writeFileSync(join(staticRoot, "index.html"), "<!doctype html><p>fake TokDash app</p>");
+    writeFileSync(join(assetsDir, "app-abc123.js"), "console.log('fake asset');");
+  });
+
+  afterAll(() => {
+    rmSync(staticRoot, { recursive: true, force: true });
+  });
+
+  test("serves index and hashed assets outside cwd/dist", async () => {
+    expect(staticRoot).not.toBe(join(process.cwd(), "dist"));
+    const staticApp = createApp({
+      configPath,
+      store,
+      refresh,
+      executor: gated,
+      now: NOW,
+      distDir: staticRoot,
+    });
+
+    const index = await staticApp.request("/");
+    expect(index.status).toBe(200);
+    expect(await index.text()).toContain("fake TokDash app");
+    expect(index.headers.get("content-type")).toContain("text/html");
+
+    const asset = await staticApp.request("/assets/app-abc123.js");
+    expect(asset.status).toBe(200);
+    expect(await asset.text()).toBe("console.log('fake asset');");
+    expect(asset.headers.get("content-type")).toContain("javascript");
   });
 });

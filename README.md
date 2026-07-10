@@ -1,13 +1,13 @@
 # TokDash
 
-A local, dark-first dashboard that aggregates [`ccusage`](https://github.com/ryoppippi/ccusage) v20
-coding-agent usage and cost across all of your machines. Instead of manually running
+A local dashboard that aggregates [`ccusage`](https://github.com/ryoppippi/ccusage) v20 coding-agent
+usage and cost across all of your machines — with first-class dark and light themes. Instead of manually running
 `bunx ccusage@latest` on each host and combining the numbers in your head, TokDash runs one unified
 `ccusage --json` fetch per host (locally or over SSH), normalizes the output, merges every host into a
 single model, and renders combined and per-host statistics with instant date-range / host / harness
 filtering. It is a single-user, localhost-only tool — no auth, no database, no deploy.
 
-![TokDash dashboard, dark theme](screenshots/desktop-dark.png)
+![TokDash dashboard, dark theme](https://raw.githubusercontent.com/ben-vargas/tokdash/main/screenshots/desktop-dark.png)
 
 Cost is the hero everywhere; tokens are the supporting act. Each host and harness keeps one consistent
 color across every chart, chip, table, and status dot.
@@ -41,6 +41,28 @@ color across every chart, chip, table, and status dot.
 - macOS or Linux hosts. (Windows hosts are a non-goal.)
 
 ## Quick start
+
+### Install
+
+Run TokDash from the directory where you want `tokdash.config.json` and `.cache/` to live. The
+zero-config in-app onboarding takes it from there.
+
+```bash
+bunx tokdash
+```
+
+Or install it globally with npm:
+
+```bash
+npm install -g tokdash
+tokdash
+```
+
+Bun must be installed for either method. The npm package includes a small Node-compatible shim that
+spawns the Bun server. MOCK demo mode requires a full git clone because its dev-only `fixtures/`
+directory is not included in the published npm package.
+
+### From source
 
 ```bash
 git clone <repo-url> tokdash
@@ -84,16 +106,16 @@ startup on the network.
 
 | | |
 |---|---|
-| ![Light theme](screenshots/desktop-light.png) | ![Mobile, 390px](screenshots/mobile-dark.png) |
+| ![Light theme](https://raw.githubusercontent.com/ben-vargas/tokdash/main/screenshots/desktop-light.png) | ![Mobile, 390px](https://raw.githubusercontent.com/ben-vargas/tokdash/main/screenshots/mobile-dark.png) |
 | Light theme (warm paper, same tokens) | Responsive collapse at 390px |
 
-![Host error state](screenshots/host-error-state.png)
+![Host error state](https://raw.githubusercontent.com/ben-vargas/tokdash/main/screenshots/host-error-state.png)
 
 A host that fails to refresh (here an unreachable SSH alias) degrades to its last cached snapshot with
 a visible error dot and a tooltip carrying the real reason and exit code — the rest of the dashboard
 renders normally.
 
-![Hermes-only, custom range](screenshots/filters-hermes.png)
+![Hermes-only, custom range](https://raw.githubusercontent.com/ben-vargas/tokdash/main/screenshots/filters-hermes.png)
 
 Filtering to a single harness over a custom range: a harness that lives on only one host shows `$0.00`
 for the others; unified agent slices provide its real per-model costs.

@@ -267,11 +267,9 @@ export function createApp(deps: AppDeps): Hono {
 
   const distDir = deps.distDir ?? null;
   if (distDir !== null && existsSync(distDir)) {
-    // serveStatic resolves `root` relative to process.cwd(); the server is
-    // always started from the repo root (bun start / scripts/dev.ts).
-    app.use("/*", serveStatic({ root: "./dist" }));
+    app.use("/*", serveStatic({ root: distDir }));
     // SPA fallback: any non-/api GET falls back to index.html.
-    app.get("*", serveStatic({ path: "./dist/index.html" }));
+    app.get("*", serveStatic({ root: distDir, path: "index.html" }));
   }
 
   return app;
