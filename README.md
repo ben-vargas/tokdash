@@ -48,13 +48,13 @@ Run TokDash from the directory where you want `tokdash.config.json` and `.cache/
 zero-config in-app onboarding takes it from there.
 
 ```bash
-bunx tokdash
+bunx @benvargas/tokdash
 ```
 
 Or install it globally with npm:
 
 ```bash
-npm install -g tokdash
+npm install -g @benvargas/tokdash
 tokdash
 ```
 

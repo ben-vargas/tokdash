@@ -1,5 +1,5 @@
 {
-  "name": "tokdash",
+  "name": "@benvargas/tokdash",
   "version": "0.1.0",
   "description": "Multi-host ccusage dashboard — aggregate AI coding-agent usage and cost across machines over SSH",
   "license": "MIT",
