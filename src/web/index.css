@@ -1,0 +1,1005 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design tokens — verbatim from docs/design-brief.md §1.
+   Dark is the default (:root); light via [data-theme="light"].
+   Components use ONLY semantic tokens.
+   ============================================================ */
+:root {
+  /* surfaces */
+  --bg: #131211;
+  --surface: #1b1918;
+  --surface-raised: #232120;
+  --surface-hover: #262322;
+  --surface-inset: #0f0e0d;
+
+  /* borders */
+  --border-hairline: #2c2927;
+  --border-strong: #3d3936;
+
+  /* text — muted must clear WCAG AA (4.5:1) on every dark surface: it
+     carries data (axis ticks, chip costs, KPI captions, freshness ages).
+     #918980 = 5.43:1 on --bg, 5.08:1 on --surface, 4.65:1 on --surface-raised. */
+  --text-primary: #f2efec;
+  --text-secondary: #b3aca4;
+  --text-muted: #918980;
+  --text-disabled: #55504a;
+
+  /* the ONE accent — interaction chrome only, never a data series */
+  --accent: #5a9df6;
+  --accent-hover: #7ab2f8;
+  --accent-muted: rgba(90, 157, 246, 0.14);
+  --focus-ring: rgba(90, 157, 246, 0.55);
+
+  /* semantics */
+  --positive: #57c785;
+  --positive-muted: rgba(87, 199, 133, 0.14);
+  --negative: #e5695e;
+  --negative-muted: rgba(229, 105, 94, 0.14);
+  --warning: #e0b25f;
+  --warning-muted: rgba(224, 178, 95, 0.14);
+
+  /* charts */
+  --chart-grid: #262322;
+  --chart-axis: #918980; /* tick label fill = text-muted */
+  --chart-cursor: rgba(242, 239, 236, 0.05);
+
+  /* token-composition class colors (brief §6.3); cache-read is
+     deliberately the most muted and is theme-dependent */
+  --tok-input: #6f9ef2;
+  --tok-output: #e0876b;
+  --tok-cache-create: #e5c05e;
+  --tok-cache-read: #3d4c63;
+
+  /* elevation (brief §5.1) */
+  --shadow-card: none;
+  --shadow-float:
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+  --scrim: rgba(10, 9, 8, 0.6);
+
+  /* radii (brief §4.4) */
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-dialog: 12px;
+  --radius-pill: 999px;
+
+  /* type (brief §3.1) */
+  --font-sans:
+    ui-sans-serif, -apple-system, "SF Pro Text", "Inter", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo,
+    Consolas, monospace;
+
+  /* motion (brief §7) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-hover: #f4f2ef;
+  --surface-inset: #f2f0ec;
+
+  --border-hairline: #e8e4de;
+  --border-strong: #d5cfc7;
+
+  /* light muted likewise clears AA: #78726a = 4.52:1 on --bg, 4.76:1 on white */
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #78726a;
+  --text-disabled: #b8b2a9;
+
+  --accent: #2e6fd8;
+  --accent-hover: #2258b4;
+  --accent-muted: rgba(46, 111, 216, 0.1);
+  --focus-ring: rgba(46, 111, 216, 0.45);
+
+  --positive: #1a7f4b;
+  --positive-muted: rgba(26, 127, 75, 0.1);
+  --negative: #c23b2e;
+  --negative-muted: rgba(194, 59, 46, 0.1);
+  --warning: #9a6b0a;
+  --warning-muted: rgba(154, 107, 10, 0.12);
+
+  --chart-grid: #ece8e2;
+  --chart-axis: #78726a;
+  --chart-cursor: rgba(28, 25, 23, 0.04);
+
+  --tok-cache-read: #c4cede;
+
+  --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-float:
+    0 8px 24px rgba(28, 25, 23, 0.12),
+    0 2px 6px rgba(28, 25, 23, 0.08);
+  --scrim: rgba(28, 25, 23, 0.35);
+}
+
+/* Map semantic tokens into Tailwind v4 utilities (inline so the var()
+   reference resolves at use time — required for runtime theming). */
+@theme inline {
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--surface-raised);
+  --color-hover: var(--surface-hover);
+  --color-inset: var(--surface-inset);
+  --color-hairline: var(--border-hairline);
+  --color-strong: var(--border-strong);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-disabled: var(--text-disabled);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-positive: var(--positive);
+  --color-positive-muted: var(--positive-muted);
+  --color-negative: var(--negative);
+  --color-negative-muted: var(--negative-muted);
+  --color-warning: var(--warning);
+  --color-warning-muted: var(--warning-muted);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  background: var(--bg);
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  color-scheme: light;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+* {
+  box-sizing: border-box;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus (brief §5.3): ring outside a 2px gap; keyboard only. */
+:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--focus-ring);
+  border-radius: var(--radius-control);
+}
+
+/* ============================================================
+   Type scale utilities (brief §3.2)
+   ============================================================ */
+.t-hero {
+  font-size: 32px;
+  line-height: 38px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+.t-kpi {
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+.t-title {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.t-section {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 600;
+}
+.t-body {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.t-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.t-caption {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 450;
+}
+@media (max-width: 480px) {
+  /* 390px compact KPI variant (brief §4.3) */
+  .t-hero {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .t-kpi {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
+
+/* ============================================================
+   Surfaces
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.floating {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+}
+[data-theme="light"] .floating {
+  border-color: var(--border-hairline);
+}
+.inset-well {
+  background: var(--surface-inset);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-control);
+}
+
+/* ============================================================
+   Controls
+   ============================================================ */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--radius-control);
+  color: var(--text-secondary);
+  transition:
+    background 120ms var(--ease-out),
+    color 120ms var(--ease-out);
+}
+.btn-ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.btn-ghost:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+  background: none;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  /* Dark theme: near-black label on the bright azure fill (Linear/Vercel
+     idiom) — white on #5a9df6 is only 2.77:1; var(--bg) #131211 is 6.76:1
+     (8.51:1 on hover). Light theme keeps white (4.79:1 on #2e6fd8). */
+  color: var(--bg);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  transition: background 120ms var(--ease-out);
+}
+[data-theme="light"] .btn-primary {
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  background: var(--negative);
+  /* Same contrast rationale as .btn-primary: dark label on the dark-theme
+     red fill (5.80:1 vs 3.22:1 for white); light theme keeps white (5.30:1). */
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 500;
+}
+[data-theme="light"] .btn-danger {
+  color: #ffffff;
+}
+
+/* Segmented control (brief §6.1) */
+.seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-control);
+  padding: 2px;
+  flex: none;
+}
+.seg-btn {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: calc(var(--radius-control) - 2px);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition:
+    background 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+.seg-btn:hover {
+  color: var(--text-primary);
+}
+.seg-btn[aria-pressed="true"] {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  border-color: var(--border-hairline);
+}
+[data-theme="light"] .seg-btn[aria-pressed="true"] {
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.08);
+}
+
+/* Chips (brief §6.1) — identity colors arrive via style="--chip: <hex>" */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px 0 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  border: 1px solid var(--border-hairline);
+  background: transparent;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex: none;
+  transition:
+    background 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+.chip .chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--text-disabled);
+  flex: none;
+  transition: background 200ms var(--ease-out);
+}
+.chip:hover {
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+}
+.chip[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--chip) 16%, transparent);
+  border-color: color-mix(in srgb, var(--chip) 45%, transparent);
+  color: var(--text-primary);
+}
+.chip[aria-pressed="true"] .chip-dot {
+  background: var(--chip);
+}
+.chip[aria-pressed="true"]:hover {
+  background: color-mix(in srgb, var(--chip) 22%, transparent);
+}
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.chip:disabled:hover {
+  background: transparent;
+}
+.chip .chip-cost {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 450;
+}
+/* Touch targets: the 28px chip / 26px segment visuals stay per §6.1,
+   but on touch-width screens an invisible ±6px vertical hit area brings
+   the effective target to ~40px. (.switch is excluded — its ::after is
+   the knob.) */
+@media (max-width: 767px) {
+  .chip,
+  .seg-btn {
+    position: relative;
+  }
+  .chip::after,
+  .seg-btn::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -6px;
+    bottom: -6px;
+  }
+}
+
+/* Text inputs (brief §6.6 field spec) */
+.field {
+  height: 32px;
+  width: 100%;
+  padding: 0 10px;
+  background: var(--surface-inset);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-control);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 20px;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+.field::placeholder {
+  color: var(--text-muted);
+}
+textarea.field {
+  height: auto;
+  padding: 6px 10px;
+  resize: vertical;
+}
+
+/* Toggle switch (brief §6.6) */
+.switch {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--surface-inset);
+  border: 1px solid var(--border-hairline);
+  flex: none;
+  transition: background 120ms var(--ease-out);
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #f2efec;
+  transition: transform 120ms var(--ease-out);
+}
+[data-theme="light"] .switch::after {
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(28, 25, 23, 0.25);
+}
+.switch[aria-checked="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.switch[aria-checked="true"]::after {
+  transform: translateX(14px);
+}
+
+/* ============================================================
+   Tables (brief §6.4/§6.5)
+   ============================================================ */
+.btable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.btable th {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border-hairline);
+  white-space: nowrap;
+  user-select: none;
+}
+.btable th.num,
+.btable td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.btable td {
+  height: 36px;
+  padding: 2px 10px;
+  font-size: 13px;
+  line-height: 20px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--border-hairline) 50%, transparent);
+  white-space: nowrap;
+}
+.btable tbody tr:last-child td {
+  border-bottom: none;
+}
+.btable tbody tr:hover td {
+  background: var(--surface-hover);
+}
+.btable th button {
+  text-transform: inherit;
+  letter-spacing: inherit;
+  font: inherit;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btable th button:hover,
+.btable th button[data-active="true"] {
+  color: var(--text-primary);
+}
+
+/* Horizontal-scroll tables with a sticky label column (brief §4.3).
+   When content actually overflows, TableScroll sets data-fade-right and
+   a 16px edge fade + an always-visible thin scrollbar signal the hidden
+   columns — numerals never hard-clip mid-glyph (brief §8.7). */
+.table-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-scroll[data-fade-right="true"] {
+  mask-image: linear-gradient(
+    to right,
+    black calc(100% - 16px),
+    transparent
+  );
+}
+.table-scroll .btable th:first-child,
+.table-scroll .btable td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border-hairline);
+  z-index: 1;
+}
+.table-scroll .btable tbody tr:hover td:first-child {
+  background: var(--surface-hover);
+}
+
+/* Breakdown cards are inline-size containers: the four token-class
+   detail columns (In / Out / Cache W / Cache R) only render when the
+   card is wide enough to fit all nine columns — otherwise the table
+   degrades deliberately to label/Cost/Share/Tokens/Trend instead of
+   hiding half its columns behind an unsignaled scroll (brief §8.7;
+   deviation from §4.2's fixed column list, reason: reviewer-confirmed
+   desktop clipping). */
+.bd-card {
+  container-type: inline-size;
+}
+@container (max-width: 879px) {
+  .col-detail {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Filter bar
+   ============================================================ */
+.filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  /* -webkit- first, standard last: the Tailwind/Lightning CSS optimize
+     pass collapses the pair keeping the last-declared form, and the
+     standard property is the one Chromium understands (Safari ≥18 too). */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* Horizontally scrolling chip rows on mobile (brief §4.3) */
+.scroll-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .scroll-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 16px,
+      black calc(100% - 16px),
+      transparent
+    );
+    padding: 2px 16px;
+    margin: -2px -16px;
+  }
+  .scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.vdivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-hairline);
+  flex: none;
+}
+@media (max-width: 767px) {
+  .vdivider {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Tooltips (brief §6.7) — CSS hover/focus tooltip, 300ms delay
+   ============================================================ */
+.tip {
+  position: relative;
+  display: inline-flex;
+}
+.tip-card {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-float);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  width: max-content;
+  max-width: 280px;
+  white-space: normal;
+  text-align: left;
+  z-index: 60;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 120ms var(--ease-out) 0ms,
+    visibility 0ms 120ms;
+}
+[data-theme="light"] .tip-card {
+  border-color: var(--border-hairline);
+}
+.tip:hover > .tip-card {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 120ms var(--ease-out) 300ms,
+    visibility 0ms 300ms;
+}
+.tip:focus-within > .tip-card {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 120ms var(--ease-out) 0ms;
+}
+.tip-card.tip-left {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+/* Open below the trigger — for triggers near the viewport top (header
+   freshness cluster), where an above-placed card would clip off-screen. */
+.tip-card.tip-below {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+
+/* ============================================================
+   Badges & pills
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.badge-neutral {
+  color: var(--text-muted);
+  background: var(--surface-hover);
+}
+.badge-negative {
+  color: var(--negative);
+  background: var(--negative-muted);
+}
+.badge-positive {
+  color: var(--positive);
+  background: var(--positive-muted);
+}
+.badge-warning {
+  color: var(--warning);
+  background: var(--warning-muted);
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+}
+
+/* ============================================================
+   Dialog
+   ============================================================ */
+dialog.dlg {
+  /* Tailwind preflight zeroes margins — restore UA centering. */
+  margin: auto;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-dialog);
+  box-shadow: var(--shadow-float);
+  color: var(--text-primary);
+  padding: 20px;
+  width: 560px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  animation: dlg-in 200ms var(--ease-out);
+}
+[data-theme="light"] dialog.dlg {
+  border-color: var(--border-hairline);
+}
+dialog.dlg::backdrop {
+  background: var(--scrim);
+  animation: scrim-in 150ms var(--ease-out);
+}
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-width: 640px) {
+  /* full-screen sheet (brief §6.6) */
+  dialog.dlg {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+/* ============================================================
+   Toasts (brief §6.7)
+   ============================================================ */
+/* The stack is a [popover=manual] so it renders in the top layer above
+   modal dialogs; undo the UA popover chrome (inset:0/margin:auto/border/
+   background) and keep the §6.7 bottom-right placement. */
+.toast-stack {
+  position: fixed;
+  inset: auto 16px 16px auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+}
+@media (max-width: 640px) {
+  .toast-stack {
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+.toast {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-left-width: 2px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-float);
+  padding: 12px 14px;
+  animation: toast-in 200ms var(--ease-out);
+}
+[data-theme="light"] .toast {
+  border-color: var(--border-hairline);
+}
+.toast[data-exiting="true"] {
+  opacity: 0;
+  transition: opacity 150ms var(--ease-out);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Skeletons (brief §6.8)
+   ============================================================ */
+.skel {
+  background: var(--surface-hover);
+  border-radius: 4px;
+  animation: skel-pulse 1.6s ease-in-out infinite;
+}
+@keyframes skel-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Refresh spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================
+   Layout grids (brief §4.2/§4.3)
+   ============================================================ */
+.page {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (max-width: 767px) {
+  .page {
+    padding: 0 16px;
+  }
+}
+.kpi-grid > *,
+.chart-2up > *,
+.breakdown-grid > * {
+  /* grid items default to min-width:auto — wide tables/charts must
+     scroll inside their card, never widen the page */
+  min-width: 0;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1023px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.chart-2up {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1023px) {
+  .chart-2up {
+    grid-template-columns: 1fr;
+  }
+}
+/* Deviation from brief §4.2's 3-column breakdown row (reason: nine
+   columns cannot fit a ~400px card at 1440 — reviewer-confirmed digit
+   clipping): host + harness sit 2-up, the many-column By-model card
+   goes full-width below them. */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.breakdown-grid > :last-child {
+  grid-column: 1 / -1;
+}
+@media (max-width: 1023px) {
+  .breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+  .breakdown-grid > :last-child {
+    grid-column: auto;
+  }
+}
+
+/* Recharts chrome discipline */
+.recharts-wrapper {
+  font-variant-numeric: tabular-nums;
+}
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* ============================================================
+   Reduced motion (brief §7): everything → 0ms except the refresh
+   spinner replacement and skeleton pulse (static fill).
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .skel {
+    animation: none;
+    opacity: 0.8;
+  }
+  .spin {
+    animation: none;
+  }
+}

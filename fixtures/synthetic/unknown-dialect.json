@@ -1,0 +1,46 @@
+{
+  "daily": [
+    {
+      "period": "2026-06-05",
+      "costUSD": 4.821334,
+      "inputTokens": 512044,
+      "outputTokens": 18095,
+      "cacheCreationTokens": 12000,
+      "cacheReadTokens": 6100000,
+      "totalTokens": 6642139,
+      "modelList": [
+        "goose-pilot-2",
+        "glm-5.2:cloud"
+      ],
+      "provider": "block-goose",
+      "region": "us-west-2",
+      "sessionsCount": 3,
+      "wireVersion": "goose/1.7.0"
+    },
+    {
+      "period": "2026-06-06",
+      "costUSD": 0.276501,
+      "inputTokens": 40122,
+      "outputTokens": 2210,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 331904,
+      "totalTokens": 374236,
+      "modelList": [
+        "goose-pilot-2"
+      ],
+      "provider": "block-goose",
+      "region": "us-west-2",
+      "sessionsCount": 1,
+      "wireVersion": "goose/1.7.0"
+    }
+  ],
+  "totals": {
+    "costUSD": 5.097835,
+    "inputTokens": 552166,
+    "outputTokens": 20305,
+    "cacheCreationTokens": 12000,
+    "cacheReadTokens": 6431904,
+    "totalTokens": 7016375,
+    "sessionsCount": 4
+  }
+}

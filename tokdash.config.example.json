@@ -1,0 +1,38 @@
+{
+  "timezone": "America/New_York",
+  "fetchWindowDays": 90,
+  "refreshIntervalMinutes": 5,
+  "hosts": [
+    {
+      "id": "laptop",
+      "label": "Laptop (local)",
+      "color": "#7c8cf8",
+      "enabled": true,
+      "ssh": null,
+      "ccusageCmd": "bunx ccusage@latest"
+    },
+    {
+      "id": "workstation",
+      "label": "Workstation (bun, via SSH)",
+      "color": "#4ec9b0",
+      "enabled": true,
+      "ssh": "workstation",
+      "ccusageCmd": "~/.bun/bin/bunx ccusage@latest",
+      "extraSources": [
+        {
+          "type": "pi-jsonl",
+          "agent": "omp",
+          "path": "~/.omp/agent/sessions"
+        }
+      ]
+    },
+    {
+      "id": "buildbox",
+      "label": "Build box (nvm node, via SSH)",
+      "color": "#e8a951",
+      "enabled": true,
+      "ssh": "buildbox",
+      "ccusageCmd": "PATH=\"$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node | sort -V | tail -1)/bin:$PATH\" npx -y ccusage@latest"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "daily": [
+    {
+      "agent": "all",
+      "period": "2026-06-11",
+      "totalCost": 20.6698275,
+      "totalTokens": 17847320,
+      "inputTokens": 242028,
+      "outputTokens": 116664,
+      "cacheCreationTokens": 879054,
+      "cacheReadTokens": 16609574,
+      "metadata": {
+        "agents": [
+          "claude",
+          "warpspeed"
+        ]
+      },
+      "modelsUsed": [
+        "claude-opus-4-7",
+        "warp-turbo-2"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "claude-opus-4-7",
+          "cost": 15.5398835,
+          "inputTokens": 1552,
+          "outputTokens": 104430,
+          "cacheCreationTokens": 879054,
+          "cacheReadTokens": 10742240
+        },
+        {
+          "modelName": "warp-turbo-2",
+          "cost": 5.129944,
+          "inputTokens": 240476,
+          "outputTokens": 12234,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 5867334
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "inputTokens": 242028,
+    "outputTokens": 116664,
+    "cacheCreationTokens": 879054,
+    "cacheReadTokens": 16609574,
+    "totalTokens": 17847320,
+    "totalCost": 20.6698275
+  }
+}

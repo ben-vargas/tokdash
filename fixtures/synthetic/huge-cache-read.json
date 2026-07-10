@@ -1,0 +1,70 @@
+{
+  "daily": [
+    {
+      "agent": "all",
+      "period": "2026-06-01",
+      "inputTokens": 6472270,
+      "outputTokens": 128292,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 82060393750,
+      "totalCost": 82.06393750000001,
+      "metadata": {
+        "agents": [
+          "codex"
+        ]
+      },
+      "modelsUsed": [
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "gpt-5.5",
+          "cost": 82.06393750000001,
+          "inputTokens": 6472270,
+          "outputTokens": 128292,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 82060393750
+        }
+      ],
+      "totalTokens": 82066994312
+    },
+    {
+      "agent": "all",
+      "period": "2026-06-02",
+      "inputTokens": 31316378,
+      "outputTokens": 2134539,
+      "cacheCreationTokens": 2284633,
+      "cacheReadTokens": 47443987654321,
+      "totalCost": 39.6598589700001,
+      "metadata": {
+        "agents": [
+          "codex",
+          "opencode"
+        ]
+      },
+      "modelsUsed": [
+        "accounts/fireworks/routers/kimi-k2p5-turbo",
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "accounts/fireworks/routers/kimi-k2p5-turbo",
+          "cost": 39.6598589700001,
+          "inputTokens": 31316378,
+          "outputTokens": 2134539,
+          "cacheCreationTokens": 2284633,
+          "cacheReadTokens": 47443987654321
+        }
+      ],
+      "totalTokens": 47444023389871
+    }
+  ],
+  "totals": {
+    "inputTokens": 37788648,
+    "outputTokens": 2262831,
+    "cacheCreationTokens": 2284633,
+    "cacheReadTokens": 47526048048071,
+    "totalTokens": 47526090384183,
+    "totalCost": 121.72379647000011
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "daily": [
+    {
+      "agent": "all",
+      "period": "2026-06-01",
+      "totalCost": 174.57,
+      "totalTokens": 74918142,
+      "inputTokens": 6477303,
+      "outputTokens": 265962,
+      "cacheCreationTokens": 858799,
+      "cacheReadTokens": 67316078,
+      "metadata": {
+        "agents": [
+          "claude",
+          "codex"
+        ]
+      },
+      "modelsUsed": [
+        "claude-opus-4-8",
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "gpt-5.5",
+          "cost": 154.42,
+          "inputTokens": 6472270,
+          "outputTokens": 128292,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 51115648
+        }
+      ]
+    },
+    {
+      "agent": "all",
+      "period": "2026-06-02",
+      "totalCost": 88.10,
+      "totalTokens": 4210

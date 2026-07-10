@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.cache/
+*.log
+
+# Local, machine-specific config (copy tokdash.config.example.json to start)
+tokdash.config.json
+
+# Original build prompt (personal setup details) — kept local only
+PROMPT.md

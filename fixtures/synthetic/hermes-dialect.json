@@ -1,0 +1,38 @@
+{
+  "daily": [
+    {
+      "date": "2026-06-10",
+      "inputTokens": 1107728,
+      "outputTokens": 35241,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 13640704,
+      "totalTokens": 14791383,
+      "totalCost": 13.647521999999999,
+      "messageCount": 504,
+      "modelsUsed": [
+        "gpt-5.5"
+      ]
+    },
+    {
+      "date": "2026-06-11",
+      "inputTokens": 2828664,
+      "outputTokens": 137702,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 30834688,
+      "totalTokens": 33826193,
+      "totalCost": 34.445893999999996,
+      "messageCount": 1186,
+      "modelsUsed": [
+        "gpt-5.5"
+      ]
+    }
+  ],
+  "totals": {
+    "inputTokens": 3936392,
+    "outputTokens": 172943,
+    "cacheCreationTokens": 0,
+    "cacheReadTokens": 44475392,
+    "totalTokens": 48617576,
+    "totalCost": 48.093415999999995
+  }
+}

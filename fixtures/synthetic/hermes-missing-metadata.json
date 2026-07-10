@@ -1,0 +1,84 @@
+{
+  "session": [
+    {
+      "agent": "hermes",
+      "period": "20260426_192827_e498f7",
+      "totalCost": 4.231292,
+      "totalTokens": 5595340,
+      "inputTokens": 230476,
+      "outputTokens": 11234,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 5351424,
+      "modelsUsed": [
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "gpt-5.5",
+          "cost": 4.231292,
+          "inputTokens": 230476,
+          "outputTokens": 11234,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 5351424
+        }
+      ]
+    },
+    {
+      "agent": "claude",
+      "period": "00602acd-c222-45f3-94ff-a54e0145a273",
+      "totalCost": 3.482119,
+      "totalTokens": 2210044,
+      "inputTokens": 812,
+      "outputTokens": 24118,
+      "cacheCreationTokens": 130362,
+      "cacheReadTokens": 2054752,
+      "metadata": {
+        "lastActivity": "2026-06-11T00:11:07.884Z"
+      },
+      "modelsUsed": [
+        "claude-opus-4-8"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "claude-opus-4-8",
+          "cost": 3.482119,
+          "inputTokens": 812,
+          "outputTokens": 24118,
+          "cacheCreationTokens": 130362,
+          "cacheReadTokens": 2054752
+        }
+      ]
+    },
+    {
+      "agent": "hermes",
+      "period": "20260427_081455_a1b2c3",
+      "totalCost": 12.064313,
+      "totalTokens": 12619446,
+      "inputTokens": 887123,
+      "outputTokens": 47408,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 11672576,
+      "modelsUsed": [
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "gpt-5.5",
+          "cost": 12.064313,
+          "inputTokens": 887123,
+          "outputTokens": 47408,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 11672576
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "inputTokens": 1118411,
+    "outputTokens": 82760,
+    "cacheCreationTokens": 130362,
+    "cacheReadTokens": 19078752,
+    "totalTokens": 20424830,
+    "totalCost": 19.777724
+  }
+}

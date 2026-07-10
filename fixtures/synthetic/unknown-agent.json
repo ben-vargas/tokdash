@@ -1,0 +1,62 @@
+{
+  "session": [
+    {
+      "agent": "warpspeed",
+      "period": "warp-2026-06-11-9f3a2c",
+      "totalCost": 5.129944,
+      "totalTokens": 6120044,
+      "inputTokens": 240476,
+      "outputTokens": 12234,
+      "cacheCreationTokens": 0,
+      "cacheReadTokens": 5867334,
+      "modelsUsed": [
+        "warp-turbo-2",
+        "gpt-5.5"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "warp-turbo-2",
+          "cost": 5.129944,
+          "inputTokens": 240476,
+          "outputTokens": 12234,
+          "cacheCreationTokens": 0,
+          "cacheReadTokens": 5867334
+        }
+      ]
+    },
+    {
+      "agent": "claude",
+      "period": "72d01f2d-3f45-4917-9c41-d0668cc1a38b",
+      "totalCost": 15.5398835,
+      "totalTokens": 11727276,
+      "inputTokens": 1552,
+      "outputTokens": 104430,
+      "cacheCreationTokens": 879054,
+      "cacheReadTokens": 10742240,
+      "metadata": {
+        "lastActivity": "2026-06-11T18:22:41.101Z"
+      },
+      "modelsUsed": [
+        "claude-opus-4-7"
+      ],
+      "modelBreakdowns": [
+        {
+          "modelName": "claude-opus-4-7",
+          "cost": 15.5398835,
+          "inputTokens": 1552,
+          "outputTokens": 104430,
+          "cacheCreationTokens": 879054,
+          "cacheReadTokens": 10742240
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "inputTokens": 242028,
+    "outputTokens": 116664,
+    "cacheCreationTokens": 879054,
+    "cacheReadTokens": 16609574,
+    "totalTokens": 17847320,
+    "totalCost": 20.6698275
+  }
+}
