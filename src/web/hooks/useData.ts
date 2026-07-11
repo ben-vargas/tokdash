@@ -52,6 +52,7 @@ export function useStatusQuery() {
   return useQuery({
     queryKey: ["status"],
     queryFn: fetchStatus,
+    refetchOnWindowFocus: "always",
     refetchInterval: (query) =>
       query.state.data?.refreshing === true ? 1_000 : 30_000,
     refetchIntervalInBackground: false,
@@ -60,13 +61,14 @@ export function useStatusQuery() {
 
 /**
  * Manual refresh flow: POST /api/refresh, then poll /api/status while
- * refreshing. When the run completes, invalidate usage and toast
- * per-host failures with the real reason.
+ * refreshing. When the run completes, toast per-host failures with the
+ * real reason. Status fetchedAt changes invalidate usage independently.
  */
 export function useRefresh(status: StatusResponse | undefined) {
   const queryClient = useQueryClient();
   const { pushToast } = useToasts();
   const wasRefreshing = useRef(false);
+  const lastFetchedAt = useRef<string | null | undefined>(undefined);
   // True only when THIS tab started (or joined) a refresh via the Refresh
   // button. Scheduler-driven refreshes observed through status polling must
   // not toast success — brief §6.9: "Completion updates the age text;
@@ -84,12 +86,33 @@ export function useRefresh(status: StatusResponse | undefined) {
     },
   });
 
-  // Detect the refreshing=true -> false transition to reload usage data
-  // and surface per-host errors.
+  // Brief §6.8: fetchedAt is the data version. This catches scheduler
+  // refreshes that start and finish while the tab is hidden without causing
+  // a second usage GET for refreshes already observed in the foreground.
+  useEffect(() => {
+    if (status === undefined) return;
+    const newestFetchedAt = status.hosts.reduce<string | null>(
+      (acc, h) =>
+        h.fetchedAt !== null && (acc === null || h.fetchedAt > acc)
+          ? h.fetchedAt
+          : acc,
+      null,
+    );
+    if (lastFetchedAt.current === undefined) {
+      lastFetchedAt.current = newestFetchedAt;
+      return;
+    }
+    if (newestFetchedAt !== lastFetchedAt.current) {
+      lastFetchedAt.current = newestFetchedAt;
+      void queryClient.invalidateQueries({ queryKey: ["usage"] });
+    }
+  }, [status, queryClient]);
+
+  // Detect the refreshing=true -> false transition to surface per-host
+  // errors and user-initiated success.
   useEffect(() => {
     if (status === undefined) return;
     if (wasRefreshing.current && !status.refreshing) {
-      void queryClient.invalidateQueries({ queryKey: ["usage"] });
       const failed = status.hosts.filter(
         (h) => h.enabled && h.error !== null,
       );

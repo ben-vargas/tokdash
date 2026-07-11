@@ -10,7 +10,14 @@ export function useNow(intervalMs = 30_000): Date {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), intervalMs);
-    return () => clearInterval(t);
+    const syncWhenVisible = () => {
+      if (document.visibilityState === "visible") setNow(new Date());
+    };
+    document.addEventListener("visibilitychange", syncWhenVisible);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", syncWhenVisible);
+    };
   }, [intervalMs]);
   return now;
 }
